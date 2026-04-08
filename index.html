@@ -138,7 +138,7 @@
         <!-- Search Section -->
         <div class="glass-panel p-6 md:p-8 mb-12 relative overflow-hidden">
             <div id="scanEffect" class="scanline hidden"></div>
-            <!-- Form added for native mobile keyboard support -->
+            <!-- Form triggers window.handleSearch on submit (button click or keyboard enter) -->
             <form id="searchForm" onsubmit="event.preventDefault(); window.handleSearch();" class="flex flex-col md:flex-row gap-4">
                 <div class="relative flex-1">
                     <input 
@@ -170,7 +170,7 @@
                 <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="text-center md:text-left">
                         <p class="text-red-400 font-bold uppercase tracking-widest text-sm mb-2">Registry Mismatch</p>
-                        <p class="text-gray-400 text-lg">The requested term is not present in our 500-term institutional index.</p>
+                        <p id="errorDescription" class="text-gray-400 text-lg">The requested term is not present in our core index.</p>
                     </div>
                     <button onclick="window.suggestAcronym()" class="whitespace-nowrap px-6 py-3 rounded-xl font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all min-h-[48px]">
                         Suggest New Entry
@@ -306,11 +306,12 @@
             { term: "P/E", full: "Price-to-Earnings Ratio", definition: "The ratio for valuing a company that measures its current share price relative to its earnings per share.", source: "Investopedia" },
             { term: "PEG", full: "Price/Earnings to Growth Ratio", definition: "A stock's price-to-earnings (P/E) ratio divided by the growth rate of its earnings for a specified period.", source: "Investopedia" },
             { term: "SEC", full: "Securities and Exchange Commission", definition: "U.S. government agency that regulates the stock market and protects investors.", source: "SEC.gov" },
-            { term: "ETF", full: "Exchange-Traded Fund", definition: "A type of investment fund and exchange-traded product that is traded on stock exchanges.", source: "Investopedia" }
+            { term: "ETF", full: "Exchange-Traded Fund", definition: "A type of investment fund and exchange-traded product that is traded on stock exchanges.", source: "Investopedia" },
+            { term: "BYOD", full: "Bring Your Own Device", definition: "Policy of permitting employees to bring personally owned devices to their workplace and to use them to access privileged company information.", source: "Investopedia" }
         ];
 
         async function init() {
-            // Initialize Auth first
+            // Initialize Auth
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -376,8 +377,9 @@
 
         window.handleSearch = async function() {
             const searchInput = document.getElementById('acronymSearch');
-            const queryVal = searchInput.value.trim().toUpperCase();
+            const queryVal = searchInput.value.trim().toUpperCase(); // Case-insensitive: uppercase everything
             const feedback = document.getElementById('searchFeedback');
+            const errorDesc = document.getElementById('errorDescription');
             const resultsSection = document.getElementById('searchResults');
             const loader = document.getElementById('loader');
             const scanEffect = document.getElementById('scanEffect');
@@ -385,15 +387,17 @@
             
             if (!queryVal) return;
 
-            // Blur the input to hide mobile keyboard
+            // Blur to hide keyboard
             searchInput.blur();
 
+            // Clear previous states
             feedback.classList.add('hidden');
             resultsSection.classList.add('hidden');
             loader.classList.remove('hidden');
             scanEffect.classList.remove('hidden');
             btnText.innerText = "Analyzing...";
 
+            // 1s delay
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             loader.classList.add('hidden');
@@ -404,6 +408,8 @@
             if (found) {
                 window.showResult(found);
             } else {
+                // Fallback message with the searched term
+                errorDesc.innerText = `No definition found for "${queryVal}". This term is currently missing from our core index.`;
                 feedback.classList.remove('hidden');
                 feedback.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
