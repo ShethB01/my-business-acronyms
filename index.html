@@ -1,0 +1,346 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizTerm | Futuristic Business Dictionary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-blue: #3b82f6;
+            --accent-blue-glow: rgba(59, 130, 246, 0.4);
+            --bg-dark: #0a0a0c;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.05) 0%, transparent 40%);
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+        }
+
+        .glow-button {
+            background-color: var(--accent-blue);
+            box-shadow: 0 0 15px var(--accent-blue-glow);
+            transition: all 0.3s ease;
+        }
+
+        .glow-button:hover {
+            box-shadow: 0 0 25px var(--accent-blue-glow);
+            transform: translateY(-2px);
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .acronym-card {
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .acronym-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: scale(1.01);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-bold tracking-tighter bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                BIZTERM
+            </h1>
+            <p class="text-gray-400 font-light">The futuristic authority for corporate communication.</p>
+        </header>
+
+        <!-- Search Section -->
+        <div class="glass-panel p-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-4">
+                <input 
+                    type="text" 
+                    id="acronymSearch" 
+                    placeholder="Enter acronym (e.g. EBITDA, ROI...)" 
+                    class="search-input flex-1 px-6 py-4 rounded-xl text-lg font-medium tracking-wide"
+                >
+                <button 
+                    onclick="handleSearch()"
+                    class="glow-button px-8 py-4 rounded-xl font-bold text-white uppercase tracking-widest text-sm"
+                >
+                    Search
+                </button>
+            </div>
+            <div id="searchFeedback" class="mt-4 text-sm font-medium hidden"></div>
+        </div>
+
+        <!-- Dynamic Results Area -->
+        <div id="searchResults" class="mb-12 hidden">
+            <h2 class="text-xl font-semibold mb-4 text-blue-400 uppercase tracking-widest">Search Result</h2>
+            <div id="resultCard" class="glass-panel p-8 border-l-4 border-l-blue-500">
+                <!-- Content injected here -->
+            </div>
+        </div>
+
+        <!-- Top 20 Section -->
+        <section>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-gray-400">Top 20 Industry Standards</h2>
+                <span class="text-xs bg-gray-800 text-gray-500 px-3 py-1 rounded-full border border-gray-700">Database v2.4</span>
+            </div>
+            <div id="acronymGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Top 20 cards injected here -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-20 pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
+            &copy; 2025 BIZTERM | Data Curated via Investopedia & Forbes Standards
+        </footer>
+    </div>
+
+    <script>
+        const acronymData = [
+            { 
+                term: "ROI", 
+                full: "Return on Investment", 
+                definition: "A performance measure used to evaluate the efficiency or profitability of an investment or compare the efficiency of several different investments.",
+                source: "Investopedia"
+            },
+            { 
+                term: "EBITDA", 
+                full: "Earnings Before Interest, Taxes, Depreciation, and Amortization", 
+                definition: "A measure of a company's overall financial performance and is used as an alternative to simple earnings or net income in some circumstances.",
+                source: "Forbes Advisor"
+            },
+            { 
+                term: "KPI", 
+                full: "Key Performance Indicator", 
+                definition: "A quantifiable measure used to evaluate the success of an organization, employee, or project in meeting objectives for performance.",
+                source: "Investopedia"
+            },
+            { 
+                term: "CAGR", 
+                full: "Compound Annual Growth Rate", 
+                definition: "The mean annual growth rate of an investment over a specified period of time longer than one year.",
+                source: "Investopedia"
+            },
+            { 
+                term: "CRM", 
+                full: "Customer Relationship Management", 
+                definition: "The combination of practices, strategies, and technologies that companies use to manage and analyze customer interactions and data.",
+                source: "Forbes"
+            },
+            { 
+                term: "IPO", 
+                full: "Initial Public Offering", 
+                definition: "The process of offering shares of a private corporation to the public in a new stock issuance.",
+                source: "Investopedia"
+            },
+            { 
+                term: "GAAP", 
+                full: "Generally Accepted Accounting Principles", 
+                definition: "A common set of accounting principles, standards, and procedures which public companies in the U.S. must follow.",
+                source: "Forbes"
+            },
+            { 
+                term: "SaaS", 
+                full: "Software as a Service", 
+                definition: "A software licensing and delivery model in which software is licensed on a subscription basis and is centrally hosted.",
+                source: "Investopedia"
+            },
+            { 
+                term: "B2B", 
+                full: "Business-to-Business", 
+                definition: "A form of transaction between businesses, such as one involving a manufacturer and wholesaler, or a wholesaler and a retailer.",
+                source: "Forbes Advisor"
+            },
+            { 
+                term: "CAPEX", 
+                full: "Capital Expenditure", 
+                definition: "The money a company spends to buy, maintain, or improve its fixed assets, such as buildings, vehicles, or equipment.",
+                source: "Investopedia"
+            },
+            { 
+                term: "EBIT", 
+                full: "Earnings Before Interest and Taxes", 
+                definition: "An indicator of a company's profitability and is calculated as revenue minus expenses, excluding tax and interest.",
+                source: "Investopedia"
+            },
+            { 
+                term: "COGS", 
+                full: "Cost of Goods Sold", 
+                definition: "The direct costs of producing the goods sold by a company, including the cost of the materials and labor used.",
+                source: "Forbes"
+            },
+            { 
+                term: "M&A", 
+                full: "Mergers and Acquisitions", 
+                definition: "A general term that describes the consolidation of companies or assets through various types of financial transactions.",
+                source: "Investopedia"
+            },
+            { 
+                term: "NAV", 
+                full: "Net Asset Value", 
+                definition: "The net value of an entity and is calculated as the total value of the entity's assets minus the total value of its liabilities.",
+                source: "Forbes Advisor"
+            },
+            { 
+                term: "ROA", 
+                full: "Return on Assets", 
+                definition: "An indicator of how profitable a company is relative to its total assets, giving an idea of how efficient management is at using assets.",
+                source: "Investopedia"
+            },
+            { 
+                term: "SMART", 
+                full: "Specific, Measurable, Achievable, Relevant, Time-bound", 
+                definition: "A mnemonic acronym giving criteria to guide in the setting of goals and objectives that yield better results.",
+                source: "Forbes"
+            },
+            { 
+                term: "SWOT", 
+                full: "Strengths, Weaknesses, Opportunities, Threats", 
+                definition: "A strategic planning technique used to help a person or organization identify areas for improvement and external hazards.",
+                source: "Investopedia"
+            },
+            { 
+                term: "YTD", 
+                full: "Year-to-Date", 
+                definition: "The period starting from the beginning of the current year and continuing up to the present day.",
+                source: "Investopedia"
+            },
+            { 
+                term: "FTE", 
+                full: "Full-Time Equivalent", 
+                definition: "A unit that indicates the workload of an employed person in a way that makes workloads comparable across various contexts.",
+                source: "Forbes"
+            },
+            { 
+                term: "COB", 
+                full: "Close of Business", 
+                definition: "Refers to the end of the business day, usually 5:00 PM, when a task or transaction is expected to be completed.",
+                source: "Investopedia"
+            }
+        ];
+
+        function init() {
+            const grid = document.getElementById('acronymGrid');
+            acronymData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "acronym-card glass-panel p-6 cursor-pointer";
+                card.onclick = () => showResult(item);
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-2xl font-bold text-blue-400">${item.term}</span>
+                        <span class="text-[10px] uppercase tracking-tighter text-gray-500 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">${item.source}</span>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-300 mb-1">${item.full}</p>
+                    <p class="text-xs text-gray-500 line-clamp-2">${item.definition}</p>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Enter key support
+            document.getElementById('acronymSearch').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSearch();
+            });
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('acronymSearch').value.trim().toUpperCase();
+            const feedback = document.getElementById('searchFeedback');
+            const resultsSection = document.getElementById('searchResults');
+            
+            if (!query) return;
+
+            const found = acronymData.find(a => a.term === query);
+
+            if (found) {
+                showResult(found);
+                feedback.classList.add('hidden');
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                feedback.innerText = "No exact match found in our premium database.";
+                feedback.className = "mt-4 text-sm font-medium text-red-400 block";
+                resultsSection.classList.add('hidden');
+            }
+        }
+
+        function showResult(item) {
+            const resultsSection = document.getElementById('searchResults');
+            const resultCard = document.getElementById('resultCard');
+            
+            resultsSection.classList.remove('hidden');
+            resultCard.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-4xl font-bold text-white mb-1">${item.term}</h3>
+                        <p class="text-xl text-blue-400 font-medium">${item.full}</p>
+                    </div>
+                    <div class="bg-blue-500/10 border border-blue-500/30 px-4 py-2 rounded-lg text-xs font-bold text-blue-300 uppercase tracking-widest">
+                        Source: ${item.source}
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-gray-300 leading-relaxed text-lg">
+                        ${item.definition}
+                    </p>
+                    <div class="flex gap-2">
+                        <button onclick="copyToClipboard('${item.term}: ${item.full}')" class="text-xs text-gray-500 hover:text-white underline decoration-blue-500/50">Copy Term</button>
+                    </div>
+                </div>
+            `;
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            // Show brief UI feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            setTimeout(() => btn.innerText = originalText, 2000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
